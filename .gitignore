@@ -6,6 +6,11 @@ checkpoints/
 *.bin
 *.onnx
 
+# ── WeChat persona data (decrypted DBs, extracted chats, keys) ──
+wechat_data/
+wechat_checkpoints/
+all_keys.json
+
 # ── Allow web/ assets for GitHub Pages ──────────────────────
 !docs/*.onnx
 !docs/*.json

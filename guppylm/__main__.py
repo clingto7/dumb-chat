@@ -36,10 +36,17 @@ def main():
         print("GuppyLM — A tiny fish brain")
         print()
         print("Usage:")
-        print("  python -m guppylm train        Train the model")
-        print("  python -m guppylm prepare      Generate data & train tokenizer")
-        print("  python -m guppylm chat         Chat with Guppy")
-        print("  python -m guppylm download     Download pre-trained model from HuggingFace")
+        print("  python -m guppylm train            Train the model")
+        print("  python -m guppylm prepare          Generate data & train tokenizer")
+        print("  python -m guppylm chat             Chat with Guppy")
+        print("  python -m guppylm download         Download pre-trained model from HuggingFace")
+        print()
+        print("WeChat persona commands:")
+        print("  python -m guppylm wechat-decrypt   Extract keys & decrypt WeChat databases")
+        print("  python -m guppylm wechat-extract   Extract chat records from decrypted DBs")
+        print("  python -m guppylm wechat-prepare   Convert to ChatML + augment + train tokenizer")
+        print("  python -m guppylm wechat-train      Train persona model")
+        print("  python -m guppylm wechat-chat       Chat with persona model")
         return
 
     cmd = sys.argv[1]
@@ -67,6 +74,38 @@ def main():
 
         from .inference import main as inference_main
         inference_main()
+
+    elif cmd == "wechat-decrypt":
+        from .wechat.decrypt import decrypt_all
+        from .wechat.config import WechatDecryptConfig
+        decrypt_all(WechatDecryptConfig())
+
+    elif cmd == "wechat-extract":
+        from .wechat.extract import extract_and_save
+        from .wechat.config import WechatExtractConfig
+        extract_and_save(WechatExtractConfig())
+
+    elif cmd == "wechat-prepare":
+        from .wechat.convert import convert_to_chatml
+        from .wechat.augment import augment
+        from .wechat.prepare import prepare
+        from .wechat.config import WechatChatMLConfig, WechatAugmentConfig, WechatTrainConfig
+        # target_wxid can be passed as second arg: python -m guppylm wechat-prepare <wxid>
+        chatml_cfg = WechatChatMLConfig()
+        if len(sys.argv) > 1:
+            chatml_cfg.target_wxid = sys.argv[1]
+            sys.argv = sys.argv[1:]  # consume the wxid arg
+        convert_to_chatml(chatml_cfg)
+        augment(WechatAugmentConfig())
+        prepare(WechatTrainConfig())
+
+    elif cmd == "wechat-train":
+        from .wechat.train import train
+        train()
+
+    elif cmd == "wechat-chat":
+        from .wechat.inference import main as wechat_chat_main
+        wechat_chat_main()
 
     else:
         print(f"Unknown command: {cmd}")
