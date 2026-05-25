@@ -45,9 +45,8 @@ def evaluate(model, loader, device, max_batches=50):
     return total_loss / max(1, n)
 
 
-def train():
-    mc = GuppyConfig()
-    tc = TrainConfig()
+def train_with_configs(mc: GuppyConfig, tc: TrainConfig) -> None:
+    """Core training loop -- reusable for both fish-chat and WeChat persona."""
     device = get_device(tc)
     torch.manual_seed(tc.seed)
 
@@ -155,6 +154,13 @@ def train():
 
     elapsed = time.time() - t0
     print(f"\nDone! {elapsed:.0f}s, best eval: {best_eval:.4f}")
+
+
+def train():
+    """Train GuppyLM with default fish-chat config."""
+    mc = GuppyConfig()
+    tc = TrainConfig()
+    train_with_configs(mc, tc)
 
 
 if __name__ == "__main__":
